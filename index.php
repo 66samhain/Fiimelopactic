@@ -33,6 +33,7 @@ $youtubeLinks = $connection
                 <th scope="col">Image</th>
                 <th scope="col">start</th>
                 <th scope="col">end</th>
+                <th scope="col">answers</th>
                 <th scope="col">Actions</th>
             </tr>
             </thead>
@@ -46,6 +47,9 @@ $youtubeLinks = $connection
                     </td>
                     <td><?php echo $youtubeLink['start'] ?></td>
                     <td><?php echo $youtubeLink['end'] ?></td>
+                    <td>
+                        <a href="answers_page.php?id=<?php echo $youtubeLink['id'] ?>" class="btn btn-primary"><i class="bi bi-binoculars"></i></a>
+                    </td>
                     <td>
                         <a href="edit_song_page.php?id=<?php echo $youtubeLink['id'] ?>" type="button" class="btn btn-primary"><i class="bi bi-pencil"></i> </a>
                         <form action="delete_song_in_database.php" method="POST" class="pt-2 pb-2">
