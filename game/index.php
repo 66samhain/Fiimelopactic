@@ -33,7 +33,10 @@ foreach ($youtubeLinks as $key => $youtubeLink) {
     }
 
     $songs[$youtubeLinkId]['answers'][] = $answer;
+
 }
+shuffle($songs);
+
 
 ?>
 
