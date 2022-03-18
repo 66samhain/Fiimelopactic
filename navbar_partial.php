@@ -5,6 +5,7 @@
             <img src="https://fiipractic.asii.ro/assets/images/fp-logo.svg" alt="" ">
         </a>
         <div class="navbar-nav">
+            <a class="nav-link  float-right" href="game/index.php">Game</a>
             <a class="nav-link  float-right" href="logout.php">Logout</a>
         </div>
     </div>
