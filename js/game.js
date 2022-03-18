@@ -1,4 +1,5 @@
 var player;
+var donePlaying = false;
 const playerStateIcons = {
     play: "bi bi-play-circle",
     pause: "bi bi-pause-circle",
@@ -18,10 +19,10 @@ var answerHtml = `
 </div>
 `
 
-
 $(document).ready(function () {
+
     $('#play').click(function () {
-        currentSongNumber = Object.keys(songs)[level];
+        currentSongNumber = level;
         currentSong = songs[currentSongNumber];
         level++;
         $(this).hide()
@@ -32,8 +33,6 @@ $(document).ready(function () {
     $("body").on("click tap", ".answear", function () {
         var currentAnswer = $(this)
         var answerId = currentAnswer.data("answer-id");
-
-
         $.ajax({
             type: "POST",
             url: "../check_answer.php",
@@ -44,14 +43,16 @@ $(document).ready(function () {
             success: function (response) {
                 if(results[currentSongNumber] === undefined) {
                     results[currentSongNumber] = response
-                    $(".answear").removeClass("error")
-                    $(".answear").removeClass("success")
+                    $(".answear").removeClass("error").removeClass("success")
                     if(response) {
-                        currentAnswer.removeClass("error")
-                        currentAnswer.addClass("success")
+                        currentAnswer.removeClass("error").addClass("success")
                     } else {
-                        currentAnswer.removeClass("success")
-                        currentAnswer.addClass("error")
+                        currentAnswer.removeClass("success").addClass("error")
+                    }
+                    if(songs[currentSongNumber + 1] !== undefined) {
+                        updatePlayerIcon(playerStateIcons.next)
+                    } else {
+                        updatePlayerIcon(playerStateIcons.stop)
                     }
                 }
 
@@ -61,13 +62,71 @@ $(document).ready(function () {
             },
             dataType: 'JSON'
         });
-        var nextSongNumber = Object.keys(songs)[level + 1];
-        if(songs[nextSongNumber] !== undefined) {
-            updatePlayerIcon(playerStateIcons.next)
+
+    })
+
+    $("#player-icon").click(function() {
+        console.log('here');
+        console.log(playerIconState);
+        switch (playerIconState) {
+            case playerStateIcons.play:
+                play();
+                break;
+            case playerStateIcons.pause:
+                pause();
+                break;
+            case playerStateIcons.next:
+                next();
+                break;
+            case playerStateIcons.replay:
+                replay();
+                break;
+            case playerStateIcons.stop:
+                stop();
+                break;
+            default:
+                initPlayer()
+                break;
         }
     })
 
 });
+
+function play() {
+    player.playVideo();
+    updatePlayerIcon(playerStateIcons.pause)
+}
+
+function pause() {
+    player.pauseVideo();
+    updatePlayerIcon(playerStateIcons.play)
+}
+
+function stop() {
+    player.stopVideo();
+    $("#player-icon").hide();
+    $('#answers-wrapper').hide();
+}
+
+function next() {
+    if(songs[currentSongNumber + 1] !== undefined) {
+        level++;
+        currentSongNumber = currentSongNumber + 1;
+        currentSong = songs[currentSongNumber];
+        player.loadVideoById({'videoId':  currentSong.video_id,
+            'startSeconds':  currentSong.start,
+            'endSeconds': currentSong.end});
+        drawAnswers();
+        updatePlayerIcon(playerStateIcons.pause)
+    }
+}
+
+function replay() {
+    player.loadVideoById({'videoId':  currentSong.video_id,
+        'startSeconds':  currentSong.start,
+        'endSeconds': currentSong.end});
+    updatePlayerIcon(playerStateIcons.pause)
+}
 
 // keep
 function drawAnswers() {
@@ -112,12 +171,16 @@ function onPlayerReady(event) {
 }
 
 // keep
-function onPlayerStateChange() {
-    console.log('on-player-state');
+function onPlayerStateChange(event) {
+    if (event.data === 0 && !donePlaying) {
+        donePlaying = true;
+        updatePlayerIcon(playerStateIcons.replay)
+    } else if (event.data === 1) {
+        donePlaying = false;
+    }
 }
 
 function updatePlayerIcon(icon) {
     playerIconState = icon;
-    $("#player-icon").removeClass();
-    $("#player-icon").addClass(icon)
+    $("#player-icon").removeClass().addClass(icon);
 }
