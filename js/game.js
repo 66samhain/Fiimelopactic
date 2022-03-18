@@ -7,23 +7,64 @@ const playerStateIcons = {
     replay: "bi bi-arrow-clockwise",
     hidden: "hidden"
 }
+var results = [];
 var playerIconState = null;
 var level = 0;
 var currentSong = null;
+var currentSongNumber = null;
 var answerHtml = `
 <div class="py-2 rounded-circle">
-    <p data-id="{{id}}" class="answer">{{answer}}</p>
+    <p data-answer-id="{{id}}" class="answear">{{answer}}</p>
 </div>
 `
 
 
 $(document).ready(function () {
     $('#play').click(function () {
-        currentSong = songs[Object.keys(songs)[level]];
+        currentSongNumber = Object.keys(songs)[level];
+        currentSong = songs[currentSongNumber];
         level++;
         $(this).hide()
         drawAnswers()
         initPlayer()
+    })
+
+    $("body").on("click tap", ".answear", function () {
+        var currentAnswer = $(this)
+        var answerId = currentAnswer.data("answer-id");
+
+
+        $.ajax({
+            type: "POST",
+            url: "../check_answer.php",
+            data: {
+                'answer_id': answerId,
+                'song_id': currentSong.id
+            },
+            success: function (response) {
+                if(results[currentSongNumber] === undefined) {
+                    results[currentSongNumber] = response
+                    $(".answear").removeClass("error")
+                    $(".answear").removeClass("success")
+                    if(response) {
+                        currentAnswer.removeClass("error")
+                        currentAnswer.addClass("success")
+                    } else {
+                        currentAnswer.removeClass("success")
+                        currentAnswer.addClass("error")
+                    }
+                }
+
+            },
+            error: function () {
+                alert('error');
+            },
+            dataType: 'JSON'
+        });
+        var nextSongNumber = Object.keys(songs)[level + 1];
+        if(songs[nextSongNumber] !== undefined) {
+            updatePlayerIcon(playerStateIcons.next)
+        }
     })
 
 });
@@ -64,12 +105,13 @@ function initPlayer() {
 
 }
 
-
+// keep
 function onPlayerReady(event) {
     event.target.playVideo();
     updatePlayerIcon(playerStateIcons.pause)
 }
 
+// keep
 function onPlayerStateChange() {
     console.log('on-player-state');
 }
