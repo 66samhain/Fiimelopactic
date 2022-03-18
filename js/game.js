@@ -18,6 +18,9 @@ var answerHtml = `
     <p data-answer-id="{{id}}" class="answear">{{answer}}</p>
 </div>
 `
+var progressHtml = `
+<i data-step="{{step}}" class="mx-2 bi bi-circle"></i>
+`
 
 $(document).ready(function () {
 
@@ -27,6 +30,7 @@ $(document).ready(function () {
         level++;
         $(this).hide()
         drawAnswers()
+        drawProgress()
         initPlayer()
     })
 
@@ -42,13 +46,24 @@ $(document).ready(function () {
             },
             success: function (response) {
                 if(results[currentSongNumber] === undefined) {
+                    var currentProgress = $("#progress-wrapper").find(`[data-step='${currentSong.id}']`)
+                    currentProgress.removeClass("bi-circle").addClass("bi-circle-fill")
                     results[currentSongNumber] = response
                     $(".answear").removeClass("error").removeClass("success")
                     if(response) {
                         currentAnswer.removeClass("error").addClass("success")
+                        currentProgress.addClass('success')
                     } else {
                         currentAnswer.removeClass("success").addClass("error")
+                        currentProgress.addClass('error')
+
                     }
+                    if(songs[currentSongNumber + 1] !== undefined) {
+                        updatePlayerIcon(playerStateIcons.next)
+                    } else {
+                        updatePlayerIcon(playerStateIcons.stop)
+                    }
+                } else {
                     if(songs[currentSongNumber + 1] !== undefined) {
                         updatePlayerIcon(playerStateIcons.next)
                     } else {
@@ -141,6 +156,19 @@ function drawAnswers() {
         answersWrapper.append(answerItemHtml)
     })
 }
+
+function drawProgress() {
+    var progressWrapper = $('#progress-wrapper');
+    progressWrapper.html("");
+    var progressItemHtml;
+    songs.forEach(song => {
+        progressItemHtml = $(progressHtml
+            .replace("{{step}}", song.id)
+        )
+        progressWrapper.append(progressItemHtml)
+    })
+}
+
 
 // keep
 function initPlayer() {

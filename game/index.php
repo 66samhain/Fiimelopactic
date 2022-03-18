@@ -63,6 +63,7 @@ shuffle($songs);
         <div class="button-wrapper">
             <button type="button" id="play" class="btn btn-primary "><i class="bi bi-play"></i></button>
         </div>
+        <div class="py-5" id="progress-wrapper"></div>
         <div id="player-wrapper">
             <div id="player"></div>
             <div id="player-icon"></div>

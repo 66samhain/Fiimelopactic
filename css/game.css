@@ -5,6 +5,9 @@
     padding: 10px
 }
 
+.bi-skip-forward-circle{
+    transform: rotateY(180deg);
+}
 #answers-wrapper {
     padding:50px 100px;
 }
@@ -23,12 +26,20 @@
     font-size: 200px;
 }
 
-.success {
+p.success {
     background-color: green;
     color:white;
 }
 
-.error {
+p.error {
     background-color: red;
     color:white;
+}
+
+i.success {
+    color:green;
+}
+
+i.error {
+    color:red;
 }
