@@ -2,15 +2,14 @@
 ini_set('display_errors', 1);
 require_once "connect.php";
 
-$answers = $_POST['answers'];
+$youtubeVideoId = $_POST['id'];
 $isCorrect = $_POST['is_correct'];
-$youtubeLinkId = $_POST['id'];
-
-$connection = getConnection();
+$answers = $_POST['answers'];
+$connection  = getConnection();
 
 $sql = "SELECT video_id, start, end FROM youtube_links WHERE id = :id";
 $query =  $connection->prepare($sql);
-$query->execute(['id' => $youtubeLinkId]);
+$query->execute(['id' => $youtubeVideoId]);
 $youtubeLink = $query->fetch();
 
 if(!$youtubeLink) {
@@ -18,22 +17,18 @@ if(!$youtubeLink) {
     exit;
 }
 
-$sql = "DELETE FROM answers WHERE youtube_link_id = :id";
-$query = $connection->prepare($sql);
-$query->execute([
-    'id' => $youtubeLinkId
-]);
+$sql = "DELETE FROM answers WHERE youtube_link_id = :youtube_link_id";
+$query =  $connection->prepare($sql);
+$query->execute(['youtube_link_id' => $youtubeVideoId]);
 
 foreach ($answers as $key => $answer) {
     $sql = "INSERT into answers (answer, is_correct, youtube_link_id) VALUES (:answer, :is_correct, :youtube_link_id)";
-    $query = $connection->prepare($sql);
-    $isCorrectAnswer = $key === (int)$isCorrect ? 1 : 0;
+    $query =  $connection->prepare($sql);
     $query->execute([
         'answer' => $answer,
-        'is_correct' => $isCorrectAnswer,
-        'youtube_link_id' => $youtubeLinkId,
+        'youtube_link_id' => $youtubeVideoId,
+        'is_correct' => (int)$isCorrect === $key ? 1 : 0
     ]);
-
 }
 
 header("Location: /index.php");
