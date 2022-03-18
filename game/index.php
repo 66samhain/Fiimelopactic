@@ -21,16 +21,18 @@ foreach ($youtubeLinks as $key => $youtubeLink) {
         'is_correct' => $youtubeLink['is_correct'],
         'id' => $youtubeLink['id']
     ];
+    
+    if(!array_key_exists($youtubeLinkId, $songs)) {
+        $songs[$youtubeLinkId] = [
+            'video_id' => $videoId,
+            'id' => $youtubeLinkId,
+            'start' => $start,
+            'end' => $end,
+            'answers' => []
+        ];
+    }
 
-    $songs[$youtubeLinkId] = [
-        'video_id' => $videoId,
-        'id' => $youtubeLinkId,
-        'start' => $start,
-        'end' => $end,
-    ];
-
-    $answers[$youtubeLinkId][] = $answer;
-    $songs[$youtubeLinkId]['answers'] = $answers[$youtubeLinkId];
+    $songs[$youtubeLinkId]['answers'][] = $answer;
 }
 
 ?>
@@ -45,11 +47,9 @@ foreach ($youtubeLinks as $key => $youtubeLink) {
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet"
           integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.3.0/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="../css/game.css">
     <style>
-        #player-icon {
-            padding: 50px 0 50px 0;
-            font-size: 100px;
-        }
+
     </style>
 </head>
 
